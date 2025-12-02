@@ -1,82 +1,79 @@
 const express = require("express");
 const router = express.Router();
 const AppDataSource = require("../config/database");
+const Subject = require("../entities/Subject");
+const Student = require("../entities/Student");
 
-// TODO: Implement all CRUD operations for subjects
-// Reference: Look at studentRoutes.js and universityRoutes.js for patterns
+const subjectRepo = AppDataSource.getRepository("Subject");
 
-// POST / - Create a new subject
 router.post("/", async (req, res) => {
   try {
-    // TODO: Extract name, code, credits from req.body
-    // TODO: Validate that name, code, and credits are provided
-    // TODO: Check if code already exists (must be unique)
-    // TODO: Create and save the subject
-    // TODO: Return the created subject with 201 status
-    // TODO: Handle errors appropriately
-  } catch (error) {
-    // TODO: Return appropriate error response
+    const { name, code, credits } = req.body;
+
+    if (!name || !code || !credits) {
+      return res.status(400).json({ error: "name, code, and credits are required" });
+    }
+
+    const existing = await subjectRepo.findOne({ where: { code } });
+    if (existing) return res.status(400).json({ error: "Subject code must be unique" });
+
+    const newSubject = subjectRepo.create({ name, code, credits });
+    await subjectRepo.save(newSubject);
+
+    res.status(201).json(newSubject);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// GET / - Get all subjects
 router.get("/", async (req, res) => {
   try {
-    // TODO: Get the Subject repository
-    // TODO: Find all subjects (optionally with students relation)
-    // TODO: Return the subjects array
-    // TODO: Handle errors appropriately
-  } catch (error) {
-    // TODO: Return appropriate error response
+    const subjects = await subjectRepo.find({ relations: ["students"] });
+    res.json(subjects);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// GET /:id - Get a subject by ID
 router.get("/:id", async (req, res) => {
   try {
-    // TODO: Parse the id from req.params.id
-    // TODO: Get the Subject repository
-    // TODO: Find the subject by id (with students relation)
-    // TODO: If not found, return 404
-    // TODO: Return the subject
-    // TODO: Handle errors appropriately
-  } catch (error) {
-    // TODO: Return appropriate error response
+    const subject = await subjectRepo.findOne({
+      where: { id: req.params.id },
+      relations: ["students"],
+    });
+
+    if (!subject) return res.status(404).json({ error: "Subject not found" });
+
+    res.json(subject);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// PUT /:id - Update a subject
 router.put("/:id", async (req, res) => {
   try {
-    // TODO: Extract name, code, credits from req.body
-    // TODO: Parse the id from req.params.id
-    // TODO: Get the Subject repository
-    // TODO: Find the subject by id
-    // TODO: If not found, return 404
-    // TODO: Update the fields if provided
-    // TODO: If code is being updated, check for uniqueness
-    // TODO: Save the updated subject
-    // TODO: Return the updated subject
-    // TODO: Handle errors appropriately
-  } catch (error) {
-    // TODO: Return appropriate error response
+    const subject = await subjectRepo.findOne({ where: { id: req.params.id } });
+    if (!subject) return res.status(404).json({ error: "Subject not found" });
+
+    subjectRepo.merge(subject, req.body);
+    await subjectRepo.save(subject);
+
+    res.json(subject);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE /:id - Delete a subject
 router.delete("/:id", async (req, res) => {
   try {
-    // TODO: Parse the id from req.params.id
-    // TODO: Get the Subject repository
-    // TODO: Find the subject by id
-    // TODO: If not found, return 404
-    // TODO: Delete the subject
-    // TODO: Return 204 status (no content)
-    // TODO: Handle errors appropriately
-  } catch (error) {
-    // TODO: Return appropriate error response
+    const subject = await subjectRepo.findOne({ where: { id: req.params.id } });
+    if (!subject) return res.status(404).json({ error: "Subject not found" });
+
+    await subjectRepo.remove(subject);
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
 module.exports = router;
-

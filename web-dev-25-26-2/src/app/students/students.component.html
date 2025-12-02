@@ -62,9 +62,12 @@
 
 <main class="main">
   <div class="content">
-    <div style="margin-bottom: 1rem;">
+    <div style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
       <a routerLink="/university" style="color: var(--p-primary-color); text-decoration: none;">
         → Manage Universities
+      </a>
+      <a routerLink="/subjects" style="color: var(--p-primary-color); text-decoration: none;">
+        → Manage Subjects
       </a>
     </div>
 
@@ -139,6 +142,22 @@
         ></p-select>
         <span class="error-text" *ngIf="getFieldError('universityId')">
           {{ getFieldError("universityId") }}
+        </span>
+      </div>
+
+      <div class="form-field">
+        <label for="subjectIds">Subjects</label>
+        <p-multiSelect
+        id="subjectIds"
+        [options]="subjects"
+        formControlName="subjectIds"
+        placeholder="Select subjects"
+        optionLabel="label"
+        optionValue="value"
+        [style]="{ width: '100%' }"
+      ></p-multiSelect>
+        <span class="error-text" *ngIf="getFieldError('subjectIds')">
+          {{ getFieldError("subjectIds") }}
         </span>
       </div>
 

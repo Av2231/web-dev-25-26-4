@@ -7,6 +7,7 @@ import { MessageModule } from 'primeng/message';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { ApiService, Student, University } from '../services/api.service';
 
 @Component({
@@ -18,6 +19,7 @@ import { ApiService, Student, University } from '../services/api.service';
     InputTextModule,
     ButtonModule,
     MessageModule,
+    MultiSelectModule,
     ReactiveFormsModule,
     TableModule,
     SelectModule,
@@ -29,6 +31,7 @@ export class StudentsComponent implements OnInit {
   registrationForm: FormGroup;
   students: Student[] = [];
   universities: Array<{ label: string; value: number }> = [];
+  subjects: Array<{ label: string; value: number }> = [];
   loading = false;
   error: string | null = null;
   editingStudent: Student | null = null;
@@ -42,13 +45,15 @@ export class StudentsComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       middleName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      universityId: ['', [Validators.required]]
+      universityId: ['', [Validators.required]],
+      subjectIds: [[]]
     });
   }
 
   ngOnInit() {
     this.loadStudents();
     this.loadUniversities();
+    this.loadSubjects();
   }
 
   loadStudents() {
@@ -82,6 +87,23 @@ export class StudentsComponent implements OnInit {
     });
   }
 
+  loadSubjects() {
+    this.apiService.getSubjects().subscribe({
+      next: (subjects) => {
+        this.subjects = subjects
+            .filter(s => s.id !== undefined)
+            .map(s => ({
+             label: `${s.name} (${s.credits} credits)`, 
+             value: s.id as number                    
+            }));
+        console.log('Subjects loaded:', this.subjects);
+      },
+      error: (err) => {
+        this.error = 'Failed to load subjects: ' + (err.error?.error || err.message);
+        console.error('Error loading subjects:', err);
+      }
+    });
+  }
   onSubmit() {
     if (this.registrationForm.valid) {
       this.loading = true;
@@ -92,7 +114,8 @@ export class StudentsComponent implements OnInit {
         firstName: formValue.firstName,
         middleName: formValue.middleName || undefined,
         lastName: formValue.lastName,
-        universityId: formValue.universityId
+        universityId: formValue.universityId,
+        subjectIds: formValue.subjectIds
       };
 
       if (this.editingStudent?.id) {
@@ -139,7 +162,8 @@ export class StudentsComponent implements OnInit {
       firstName: student.firstName,
       middleName: student.middleName || '',
       lastName: student.lastName,
-      universityId: student.universityId || student.university?.id
+      universityId: student.universityId || student.university?.id,
+      subjectIds: student.subjects?.map(s => s.id) || [] 
     });
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });

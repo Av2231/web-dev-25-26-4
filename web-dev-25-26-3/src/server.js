@@ -4,8 +4,8 @@ const cors = require("cors");
 const AppDataSource = require("./config/database");
 const universityRoutes = require("./routes/universityRoutes");
 const studentRoutes = require("./routes/studentRoutes");
-// TODO: Import subject routes
-// const subjectRoutes = require("./routes/subjectRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,8 +16,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api/universities", universityRoutes);
 app.use("/api/students", studentRoutes);
-// TODO: Register subject routes
-// app.use("/api/subjects", subjectRoutes);
+app.use("/api/subjects", subjectRoutes);
+
 
 app.get("/", (req, res) => {
   res.json({
@@ -37,14 +37,13 @@ app.get("/", (req, res) => {
         "PUT /api/students/:id": "Update a student",
         "DELETE /api/students/:id": "Delete a student",
       },
-      // TODO: Add subjects endpoints documentation
-      // subjects: {
-      //   "POST /api/subjects": "Create a new subject",
-      //   "GET /api/subjects": "Get all subjects",
-      //   "GET /api/subjects/:id": "Get a subject by ID",
-      //   "PUT /api/subjects/:id": "Update a subject",
-      //   "DELETE /api/subjects/:id": "Delete a subject",
-      // },
+      subjects: {
+        "POST /api/subjects": "Create a new subject",
+        "GET /api/subjects": "Get all subjects",
+        "GET /api/subjects/:id": "Get a subject by ID",
+        "PUT /api/subjects/:id": "Update a subject",
+        "DELETE /api/subjects/:id": "Delete a subject",
+      },
     },
   });
 });

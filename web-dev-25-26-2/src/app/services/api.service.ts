@@ -24,14 +24,15 @@ export interface University {
   location: string;
 }
 
-// TODO: Add Subject interface
-// export interface Subject {
-//   id?: number;
-//   name: string;
-//   code: string;
-//   credits: number;
-//   students?: Student[]; // Optional, for when relation is loaded
-// }
+export interface Subject {
+  id?: number;
+  name: string;
+  code: string;
+  credits: number;
+  students?: Student[];
+}
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -81,12 +82,24 @@ export class ApiService {
     return this.http.delete<void>(`${API_URL}/universities/${id}`);
   }
 
-  // TODO: Implement Subject endpoints
-  // Follow the same pattern as Student and University methods above
-  // getSubjects(): Observable<Subject[]>
-  // getSubject(id: number): Observable<Subject>
-  // createSubject(subject: Omit<Subject, 'id'>): Observable<Subject>
-  // updateSubject(id: number, subject: Partial<Subject>): Observable<Subject>
-  // deleteSubject(id: number): Observable<void>
+  getSubjects(): Observable<Subject[]> {
+    return this.http.get<Subject[]>(`${API_URL}/subjects`);
+  }
+  
+  getSubject(id: number): Observable<Subject> {
+    return this.http.get<Subject>(`${API_URL}/subjects/${id}`);
+  }
+  
+  createSubject(subject: Omit<Subject, "id">): Observable<Subject> {
+    return this.http.post<Subject>(`${API_URL}/subjects`, subject);
+  }
+  
+  updateSubject(id: number, subject: Partial<Subject>): Observable<Subject> {
+    return this.http.put<Subject>(`${API_URL}/subjects/${id}`, subject);
+  }
+  
+  deleteSubject(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/subjects/${id}`);
+  }
 }
 

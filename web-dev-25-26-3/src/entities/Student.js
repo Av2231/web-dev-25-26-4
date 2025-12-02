@@ -36,13 +36,10 @@ module.exports = new EntitySchema({
       },
       nullable: false,
     },
-    // TODO: Add many-to-many relationship with Subject
-    // This is the inverse side of the relationship defined in Subject.js
-    // Example:
-    // subjects: {
-    //   target: "Subject",
-    //   type: "many-to-many",
-    //   inverseSide: "students",
-    // },
+    subjects: {
+      type: "many-to-many",
+      target: "Subject",
+      inverseSide: "students",
+    },
   },
 });
